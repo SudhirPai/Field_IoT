@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -48,30 +49,39 @@ month[9] = "October"
 month[10] ="November";
 month[11] = "December";
 var month = month[f.getMonth()];
+function check(){
+var from =document.getElementById("fromTime");
+var to=document.getElementById("toTime");
+if (from>to) {
+alert("Invalid Input");
+}}
+
 </script>
 </head>
 
 <body onload="startTime()" align='center'>
-
 <br><br>
 <h2>Time Scheduler</h2>
 <br>
 <div id="txt"></div>
 <p id="date"></p>
-<style>div.groove {border-style: groove; height:30px; width: 600px;margin-top: 25px;margin-bottom:15px;margin-right:80px;margin-left:400px;}</style>
-<form>
- From Time:&nbsp;&nbsp;<input type="time" name="from"s><br> To Time:&nbsp;&nbsp;&nbsp;<input type="Time" name="to"><br>
-   Select Day of Week: &nbsp; &nbsp; &nbsp;<div class="groove">
+<style>div.dayOfWeek {border-style: groove; height:30px; width: 600px; margin: auto; text-align: center;}</style>
+<form method="post">
+ From Time:&nbsp;&nbsp;<input type="time" name="from" id="fromTime"><br><BR> To Time:&nbsp;&nbsp;&nbsp;<input type="Time" name="to" id="toTime" min=from><br>
+   Select Day of Week: &nbsp; &nbsp; &nbsp;
+<div class='dayOfWeek'>
   <input type="checkbox" name="week" value="Monday" checked> Monday
-  <input type="checkbox" name="week" value="Tuesday">Tuesday
-  <input type="checkbox" name="week" value="Wednesday">Wednesday  
-  <input type="checkbox" name="week" value="Thursday">Thursday
-  <input type="checkbox" name="week" value="Friday">Friday
+  <input type="checkbox" name="week" value="Tuesday" checked>Tuesday
+  <input type="checkbox" name="week" value="Wednesday"checked>Wednesday  
+  <input type="checkbox" name="week" value="Thursday"checked>Thursday
+  <input type="checkbox" name="week" value="Friday"checked>Friday
   <input type="checkbox" name="week" value="Saturday">Saturday
   <input type="checkbox" name="week" value="Sunday">Sunday<br>
-</div>
-  <input type="submit">
+</div><br>
+  <input type="Submit" value="submit" onClick="check()">&nbsp; &nbsp;<input type="reset" value="clear">
+
+
 </form>
 
 </body>
-</html> 
+</html>
