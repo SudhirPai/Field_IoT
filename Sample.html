@@ -49,8 +49,6 @@ month[9] = "October"
 month[10] ="November";
 month[11] = "December";
 var month = month[f.getMonth()];
-
-
 </script>
 </head>
 
@@ -81,7 +79,7 @@ var month = month[f.getMonth()];
 	  <td><div id="name">Name</div></td>
 	  <td><div id="from">From</div></td>
 	  <td><div id="to">To</div></td>
-	  <td><div id="dow"">Mo&nbsp;&nbsp;Tu&nbsp;&nbsp;We&nbsp;&nbsp;Th&nbsp;&nbsp;Fr&nbsp;&nbsp;Sa&nbsp;&nbsp;Su</th>
+	  <td><div id="dow">Mo&nbsp;&nbsp;Tu&nbsp;&nbsp;We&nbsp;&nbsp;Th&nbsp;&nbsp;Fr&nbsp;&nbsp;Sa&nbsp;&nbsp;Su</th>
 	 </tr>	
     <tr>
      <td><input type="checkbox" name="active"></td>
@@ -104,13 +102,52 @@ var month = month[f.getMonth()];
 function check(){
 var from =document.getElementById("fromTime").value;
 var to=document.getElementById("toTime").value;
+var status=document.getElementById("status");
+var name=document.getElementById("name");
+var from=document.getElementById("from");
+var to=document.getElementById("to");
+var daysOfWeek=document.getElementById("dow").value;
 if( from==="" || to==="") 
-{alert(" Empty input");}
-else if(from>to) {alert("Invalid Input");}
-}
+  {alert(" Empty input");}
+ else if(from>to)
+   {alert("Invalid Input");}
+ else
+ {
+    var table = document.getElementById("tableList");
+    var rowCount = table.rows.length;
+			var row = table.insertRow(rowCount);
 
- 
+			var cell1 = row.insertCell(0);
+			var element1 = document.createElement("input");
+			element1.type = "checkbox";
+			element1.name="chkbox[]";
+			cell1.appendChild(element1);
+
+			var cell2 = row.insertCell(1);
+			cell2.innerHTML = name.value();
+
+			var cell3 = row.insertCell(2);
+			var element2 = from.value();
+			cell3.appendChild(element2);
+
+      var cell4 = row.insertCell(3);
+      var element3 = to.value();
+      cell4.appendChild(element3);
+
+      var cell5 = row.insertCell(4);
+      var checkedValue= document.getElementsByName("week");
+      for(var i=0;i<checkedValue[i];++i)
+      {
+        if(inputElements[i].checked){
+           checkedValue = inputElements[i].value;
+           break;
+      }
+
+      }
+      
+ }
 }
+ 
 </script>
 </body>
 </html>
