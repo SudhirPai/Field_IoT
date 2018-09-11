@@ -49,12 +49,7 @@ month[9] = "October"
 month[10] ="November";
 month[11] = "December";
 var month = month[f.getMonth()];
-function check(){
-var from =document.getElementById("fromTime");
-var to=document.getElementById("toTime");
-if (from>to) {
-alert("Invalid Input");
-}}
+
 
 </script>
 </head>
@@ -66,10 +61,10 @@ alert("Invalid Input");
 <div id="txt"></div>
 <p id="date"></p>
 <style>div.dayOfWeek {border-style: groove; height:30px; width: 600px; margin: auto; text-align: center;}</style>
-<form method="post">
- From Time:&nbsp;&nbsp;<input type="time" name="from" id="fromTime"><br><BR> To Time:&nbsp;&nbsp;&nbsp;<input type="Time" name="to" id="toTime" min=from><br>
+<form method="post" id="inputTime">
+ From Time:&nbsp;&nbsp;<input type="time" name="from" id="fromTime"><br><br> To Time:&nbsp;&nbsp;&nbsp;<input type="Time" name="to" id="toTime"><br>
    Select Day of Week: &nbsp; &nbsp; &nbsp;
-<div class='dayOfWeek'>
+<div class='dayOfWeek' id="DoW">
   <input type="checkbox" name="week" value="Monday" checked> Monday
   <input type="checkbox" name="week" value="Tuesday" checked>Tuesday
   <input type="checkbox" name="week" value="Wednesday"checked>Wednesday  
@@ -78,10 +73,44 @@ alert("Invalid Input");
   <input type="checkbox" name="week" value="Saturday">Saturday
   <input type="checkbox" name="week" value="Sunday">Sunday<br>
 </div><br>
-  <input type="Submit" value="submit" onClick="check()">&nbsp; &nbsp;<input type="reset" value="clear">
+<input type="submit" value="Submit" onclick="check();">&nbsp; &nbsp;
+<input type="reset" value="Clear"><br>
+<table id="tableList" align="center">
+	<tr>
+	  <th id="status">Status</th>
+	  <th id>Name</th>
+	  <th>From</th>
+	  <th>To</th>
+	  <th>Mo&nbsp;&nbsp;Tu&nbsp;&nbsp;We&nbsp;&nbsp;Th&nbsp;&nbsp;Fr&nbsp;&nbsp;Sa&nbsp;&nbsp;Su</th>
+	 </tr>	
+    <tr>
+     <td><input type="checkbox" name="active"></td>
+     <td>Weekdays</td> 
+     <td><input type="time" name="fromTime" ></td>
+     <td><input type="time" name="toTime" ></td>
+     <td> <input type="checkbox" name="week" value="Monday" checked> 
+  <input type="checkbox" name="week" value="Tuesday">
+  <input type="checkbox" name="week" value="Wednesday">
+  <input type="checkbox" name="week" value="Thursday">
+  <input type="checkbox" name="week" value="Friday">
+  <input type="checkbox" name="week" value="Saturday">
+  <input type="checkbox" name="week" value="Sunday"></td>
+    </tr>
+</table>
 
 
 </form>
+<script>
+function check(){
+var from =document.getElementById("fromTime").value;
+var to=document.getElementById("toTime").value;
+if( from==="" || to==="") 
+{alert(" Empty input");}
+else if(from>to) {alert("Invalid Input");}
+}
 
+ 
+}
+</script>
 </body>
 </html>
