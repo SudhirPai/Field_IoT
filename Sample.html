@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -56,10 +55,9 @@ var month = month[f.getMonth()];
 <br><br>
 <h2>Time Scheduler</h2>
 <br>
-<div id="txt"></div>
-<p id="date"></p>
+
 <style>div.dayOfWeek {border-style: groove; height:30px; width: 600px; margin: auto; text-align: center;}</style>
-<form method="post" id="inputTime">
+<form id="inputTime">
  From Time:&nbsp;&nbsp;<input type="time" name="from" id="fromTime"><br><br> To Time:&nbsp;&nbsp;&nbsp;<input type="Time" name="to" id="toTime"><br>
    Select Day of Week: &nbsp; &nbsp; &nbsp;
 <div class='dayOfWeek' id="DoW">
@@ -75,17 +73,16 @@ var month = month[f.getMonth()];
 <input type="reset" value="Clear"><br>
 <table id="tableList" align="center">
 	<tr>
-	  <td><div id="status">Status</div></td>
-	  <td><div id="name">Name</div></td>
-	  <td><div id="from">From</div></td>
-	  <td><div id="to">To</div></td>
-	  <td><div id="dow">Mo&nbsp;&nbsp;Tu&nbsp;&nbsp;We&nbsp;&nbsp;Th&nbsp;&nbsp;Fr&nbsp;&nbsp;Sa&nbsp;&nbsp;Su</th>
+	  <td>Name</div></td>
+	  <td>From</div></td>
+	  <td>To</td>
+	  <td>Mo&nbsp;&nbsp;Tu&nbsp;&nbsp;We&nbsp;&nbsp;Th&nbsp;&nbsp;Fr&nbsp;&nbsp;Sa&nbsp;&nbsp;Su</th>
 	 </tr>	
     <tr>
-     <td><input type="checkbox" name="active"></td>
-     <td>Weekdays</td> 
-     <td><input type="time" name="fromTime" ></td>
-     <td><input type="time" name="toTime" ></td>
+     
+     <td><input type ="text" ></td> 
+     <td><input type="time"></td>
+     <td><input type="time"></td>
      <td> <input type="checkbox" name="week" value="Monday" checked> 
   <input type="checkbox" name="week" value="Tuesday">
   <input type="checkbox" name="week" value="Wednesday">
@@ -99,53 +96,59 @@ var month = month[f.getMonth()];
 
 </form>
 <script>
-function check(){
+function check()
+{
+  
 var from =document.getElementById("fromTime").value;
 var to=document.getElementById("toTime").value;
-var status=document.getElementById("status");
-var name=document.getElementById("name");
-var from=document.getElementById("from");
-var to=document.getElementById("to");
-var daysOfWeek=document.getElementById("dow").value;
+var daysOfWeek=document.getElementById("DoW");
+
 if( from==="" || to==="") 
   {alert(" Empty input");}
- else if(from>to)
+else if(from>to)
    {alert("Invalid Input");}
- else
- {
-    var table = document.getElementById("tableList");
-    var rowCount = table.rows.length;
+else
+{
+  alert(checkpoint1);
+  var table = document.getElementById("tableList");
+         
+			var rowCount = table.rows.length;
 			var row = table.insertRow(rowCount);
 
 			var cell1 = row.insertCell(0);
 			var element1 = document.createElement("input");
-			element1.type = "checkbox";
-			element1.name="chkbox[]";
+			element1.type = "text";
+			element1.name="Name";
 			cell1.appendChild(element1);
 
 			var cell2 = row.insertCell(1);
-			cell2.innerHTML = name.value();
+      var element2 = document.getElementById("fromTime");
+      element2.type="time";
+      element2.name="startTime";
+      cell2.appendChild(element2);
 
-			var cell3 = row.insertCell(2);
-			var element2 = from.value();
-			cell3.appendChild(element2);
+      var cell3 = row.insertCell(2);
+      var element3 = document.getElementById("toTime");
+      element3.type="time";
+      element3.name="endTime";
+      cell3.appendChild(element3);
 
-      var cell4 = row.insertCell(3);
-      var element3 = to.value();
-      cell4.appendChild(element3);
-
-      var cell5 = row.insertCell(4);
-      var checkedValue= document.getElementsByName("week");
-      for(var i=0;i<checkedValue[i];++i)
+			var cell4 = row.insertCell(3);
+			var element4 = document.createElement("input");
+			element4.type = "checkbox";
+			element4.name = "dow";
+      cell4.appendChild(element2);
+      var checkedValue= document.getElementsByName("dow");
+        for(var i=0;i<checkedValue[i];++i)
       {
-        if(inputElements[i].checked){
-           checkedValue = inputElements[i].value;
+        if(daysOfWeek[i].checked)
+        {
+           checkedValue[i].checked = daysOfWeek[i];
            break;
-      }
-
-      }
+        } 
       
- }
+      }
+  }
 }
  
 </script>
