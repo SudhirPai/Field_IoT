@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> Sample for Mark_3</title>
+</head>
+<script>
+   function addRow()
+   {
+	  
+     var tname= document.getElementById('tname').value;
+     var ftime= document.getElementById('ftime').value;
+     var ttime= document.getElementById('ttime').value;
+   // var dow= document.getElementsByName('week');
+
+     var table = document.getElementsByTagName('table')[0];
+
+     var newRow= table.insertRow(1);
+     
+     var cell1 = newRow.insertCell(0);
+     var cell2 = newRow.insertCell(1);
+     var cell3 = newRow.insertCell(2);
+     var cell4 = newRow.insertCell(3);
+     
+     cell1.innerHTML = tname;
+     cell2.innerHTML = ftime;
+     cell3.innerHTML = ttime;
+    
+   } 
+     
+     
+		
+</script>
+<body>
+  Timer Name: <input type="text" name="tname" id="tname"><br>
+  From Time: <input type="time" name="ftime" id="ftime"><br>
+  To Time: <input type="time" name="ttime" id="ttime"><br>	
+  Days of Week: <input type="checkbox" name="week" value="Monday">Monday
+                <input type="checkbox" name="week" value="Tuesday">Tuesday
+                <input type="checkbox" name="week" value="Wednesday">Wednesday
+                <input type="checkbox" name="week" value="Thursday">Thursday
+                <input type="checkbox" name="week" value="Friday">Friday
+                <input type="checkbox" name="week" value="Saturday">Saturday
+                <input type="checkbox" name="week" value="Sunday">Sunday
+                <br>
+                                  
+  <button onClick="addRow();"> Add</button>
+<table border="1">
+   <tr>
+    <th>Name</th>
+	<th>From</th>
+	<th>To</th>
+	<th> &nbsp; Mo&nbsp;Tu&nbsp;We&nbsp;Th&nbsp;Fr&nbsp;Sa&nbsp;Su </th>
+   <tr>
+		
+</table>
+</body>
