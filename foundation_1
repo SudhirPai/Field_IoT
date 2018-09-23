@@ -1,0 +1,144 @@
+#include <RtcDS3231.h>
+#include <ArduinoJson.h>
+
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <Wire.h>
+RtcDS3231<TwoWire> rtcObject(Wire);//pin4 SDA pin5 SCL
+#include <RTClib.h>
+RTC_DS3231 rtc; 
+  uint8_t Relay = D7;  
+  bool LEDstatus = LOW;
+int fromH;
+int fromM;
+int toH;
+int toH;
+  
+  const char* ssid = "Mark_3";  // Enter SSID here
+  const char* password = "qazwsxedc";  //Enter Password here   
+   /*IP Address details */
+     IPAddress local_ip(192,168,2,1);
+     IPAddress gateway(192,168,2,1);
+     IPAddress subnet(255,255,255,0);
+     ESP8266WebServer server(80);
+
+     
+//-----------------Server Handling Conditions---5991
+void handle_OnConnect() {
+  LEDstatus = LOW;
+  server.send(200, "text/html", SendHTML(false)); 
+  }
+void handle_time()
+{
+  String data = server.arg("plain");
+  StaticJsonBuffer<200> jBuffer;
+  JsonObject& jObject = jBuffer.parseObject(data);
+  String fH = jObject["onH"];
+  String fM = jObject["onM"];
+  String tH=  jObject["offh"];
+  String tM= jObject["offM"];
+
+  fromH.write(fH.toInt());
+  fromM.write(fM.toInt());
+  toH.write(tH.toInt());
+  toM.write(tM.toInt());
+ server.send(204,"");
+ 
+}
+
+    
+  void handle_NotFound() {
+  server.send(404, "text/plain", "Not found");
+    }
+    String SendHTML(uint8_t led)
+    {  
+    String ptr = "<!DOCTYPE html>\n";
+    ptr +="<html>\n";
+    ptr +="<head>\n";
+    ptr +="<script>\n";
+    ptr +="function startTime(); { \n";
+    ptr+="var today = new Date();";
+ptr+="var dow=today.getDay();";
+ptr+="var h = today.getHours();";
+ptr+="var m = today.getMinutes();";
+ptr+="var s = today.getSeconds();";
+ptr+="m = checkTime(m);";
+ptr+="s = checkTime(s);";
+ptr+="var d = new Date();";
+ptr+="var weekday = new Array(7);";
+ptr+="weekday[0] =  \"Sunday\";";
+ptr+="weekday[1] = \"Monday\";";
+ptr+="weekday[2] = \"Tuesday\";";
+ptr+="weekday[3] = \"Wednesday\";";
+ptr+="weekday[4] = \"Thursday\";";
+ptr+="weekday[5] = \"Friday\";";
+ptr+="weekday[6] = \"Saturday\";";
+ptr+="var n = weekday[d.getDay()];";
+ptr+="var f = new Date();";
+ptr+="var month= new Array(11);";
+ptr+="month[0] =\"January\";";
+ptr+="month[1] =\"February\";";
+ptr+="month[2] = \"March\";";
+ptr+="month[3] = \"April\";";
+ptr+="month[4] = \"May\";";
+ptr+="month[5] = \"June\";";
+ptr+="month[6] = \"July\";";
+ptr+="month[7] = \"August\";";
+ptr+="month[8] = \"September\";";
+ptr+="month[9] =\"October\";";
+ptr+="month[10] =\"November\";";
+ptr+="month[11] =\"December\";";
+ptr+="var month = month[f.getMonth()];";
+ptr+="  var  y = today.getFullYear();";
+ptr+="  var  mo = today.getMonth() + 1;";
+ptr+="  var  da = today.getDate();";
+ptr+="  document.getElementById(\'txt\').innerHTML =h + \":\" + m +\":\" + s+\"::\"+n+\", \"+da + \"th \" + mo + \", \" + y;";
+ptr+="}";
+ptr+=" function checkTime(i) {";
+ptr+="    if (i < 10) {i = \"0\" + i}; "; // add zero in front of numbers < 10
+ptr+="    return i;";
+ptr+="}";
+
+    ptr +="</script>\n";
+    ptr +="\n";
+   // additional coding required
+ptr+="<body><br><br><br>";
+ptr+="<form align = \"center\" action=\"/sendTime\" method=\"post\">";
+
+ptr+="From Time(HH:MM) <input type=\"number\" id=\"onH\" min=\"0\" max=\"23\">:&nbsp&nbsp<input type=\"number\" id=\"onM\" min=\"0\" max=\"59\"><br>";
+ptr+="To Time(HH:MM) <input type=\"number\" id=\"offH\" min=\"0\" max=\"23\">:&nbsp&nbsp<input type=\"number\" id=\"offM\" min=\"0\" max=\"59\"><br>";
+ptr+="<input type=\"submit\" value=\"Submit\">";
+ptr+="</form></body></html>";
+
+    }
+  // Timer Operation
+void setup() {
+  pinMode(Relay, OUTPUT);
+   server.begin();
+  Serial.println("HTTP server started");
+   
+   Serial.begin(115200); //Starts serial connection
+   rtcObject.Begin();    //Starts I2C
+  WiFi.softAP(ssid, password);
+  WiFi.softAPConfig(local_ip, gateway, subnet);
+  delay(100);
+  
+  server.on("/", handle_OnConnect);
+  server.on("/sendTime", handle_time);
+ 
+  server.onNotFound(handle_NotFound);
+
+  server.begin();
+  Serial.println("HTTP server started");
+     
+}
+
+
+  void loop() {
+ 
+     
+ server.handleClient();
+ 
+
+
+}
