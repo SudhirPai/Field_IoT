@@ -11,7 +11,7 @@ RTC_DS3231 rtc;
   bool LEDstatus = LOW;
 int fromH;
 int fromM;
-int toH;
+int toM;
 int toH;
   
   const char* ssid = "Mark_3";  // Enter SSID here
@@ -38,10 +38,10 @@ void handle_time()
   String tH=  jObject["offh"];
   String tM= jObject["offM"];
 
-  fromH.write(fH.toInt());
-  fromM.write(fM.toInt());
-  toH.write(tH.toInt());
-  toM.write(tM.toInt());
+  fromH=fH.toInt();
+  fromM=fM.toInt();
+  toH=tH.toInt();
+  toM=tM.toInt();
  server.send(204,"");
  
 }
