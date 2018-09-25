@@ -13,44 +13,19 @@ int fromH;
 int fromM;
 int toM;
 int toH;
-  
-  const char* ssid = "Mark_3";  // Enter SSID here
+  //---------------WiFi SSID and Password--------
+  const char* ssid = "Mark_4";  // Enter SSID here
   const char* password = "qazwsxedc";  //Enter Password here   
    /*IP Address details */
-     IPAddress local_ip(192,168,2,1);
+     IPAddress local_ip(192,168,2,155);
      IPAddress gateway(192,168,2,1);
      IPAddress subnet(255,255,255,0);
      ESP8266WebServer server(80);
-
+      
      
 //-----------------Server Handling Conditions---5991
-void handle_OnConnect() {
-  LEDstatus = LOW;
-  server.send(200, "text/html", SendHTML(false)); 
-  }
-void handle_time()
-{
-  String data = server.arg("plain");
-  StaticJsonBuffer<200> jBuffer;
-  JsonObject& jObject = jBuffer.parseObject(data);
-  String fH = jObject["onH"];
-  String fM = jObject["onM"];
-  String tH=  jObject["offh"];
-  String tM= jObject["offM"];
 
-  fromH=fH.toInt();
-  fromM=fM.toInt();
-  toH=tH.toInt();
-  toM=tM.toInt();
- server.send(204,"");
- 
-}
-
-    
-  void handle_NotFound() {
-  server.send(404, "text/plain", "Not found");
-    }
-    String SendHTML(uint8_t led)
+ String SendHTML(uint8_t led)
     {  
     String ptr = "<!DOCTYPE html>\n";
     ptr +="<html>\n";
@@ -103,31 +78,57 @@ ptr+="}";
     ptr +="\n";
    // additional coding required
 ptr+="<body><br><br><br>";
-ptr+="<form align = \"center\" action=\"/sendTime\" method=\"post\">";
+ptr+="<form align = \"center\" action=\'http://192.168.2.1/submit\' method=\'post\'>";
 
 ptr+="From Time(HH:MM) <input type=\"number\" id=\"onH\" min=\"0\" max=\"23\">:&nbsp&nbsp<input type=\"number\" id=\"onM\" min=\"0\" max=\"59\"><br>";
 ptr+="To Time(HH:MM) <input type=\"number\" id=\"offH\" min=\"0\" max=\"23\">:&nbsp&nbsp<input type=\"number\" id=\"offM\" min=\"0\" max=\"59\"><br>";
-ptr+="<input type=\"submit\" value=\"Submit\">";
+ptr+="<input type=\'submit\' value=\'Submit\'>";
 ptr+="</form></body></html>";
+return ptr;
 
     }
+void handle_OnConnect() {
+  LEDstatus = LOW;
+  server.send(200, "text/html", SendHTML(false)); 
+  }
+void handleSubmit()
+{
+  String data = server.arg("plain");
+  StaticJsonBuffer<200> jBuffer;
+  JsonObject& jObject = jBuffer.parseObject(data);
+  String fH = jObject["onH"];
+  String fM = jObject["onM"];
+  String tH=  jObject["offh"];
+  String tM= jObject["offM"];
+
+  fromH=fH.toInt();
+  fromM=fM.toInt();
+  toH=tH.toInt();
+  toM=tM.toInt();
+ server.send(204,"");
+ Serial.println(fH);
+ Serial.println(fM);
+ 
+}
+
+    
+  void handle_NotFound() {
+  server.send(404, "text/plain", "Not found");
+    }
+   
   // Timer Operation
 void setup() {
   pinMode(Relay, OUTPUT);
-   server.begin();
-  Serial.println("HTTP server started");
-   
-   Serial.begin(115200); //Starts serial connection
-   rtcObject.Begin();    //Starts I2C
+  Serial.begin(115200); //Starts serial connection
+  rtcObject.Begin();    //Starts I2C
   WiFi.softAP(ssid, password);
   WiFi.softAPConfig(local_ip, gateway, subnet);
   delay(100);
   
   server.on("/", handle_OnConnect);
-  server.on("/sendTime", handle_time);
- 
+  server.on("/submit", handleSubmit);
   server.onNotFound(handle_NotFound);
-
+ 
   server.begin();
   Serial.println("HTTP server started");
      
@@ -138,7 +139,7 @@ void setup() {
  
      
  server.handleClient();
- 
+
 
 
 }
