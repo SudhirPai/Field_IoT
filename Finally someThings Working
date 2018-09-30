@@ -1,0 +1,167 @@
+/* All Library Declarations*/
+#include <Wire.h> // must be included here so that Arduino library object file references work
+//#include <DS3231.h>
+#include <RtcDS3231.h>
+//#include <ESP8266mDNS.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+/* Put your SSID & Password */
+const char* ssid = "Mark_4.1";  // Enter SSID here
+const char* password = "12345678";  //Enter Password here
+
+/*All Global variable Declaration*/
+//MDNSResponder mdns;
+IPAddress local_ip(192,168,2,1);
+IPAddress gateway(192,168,2,1);
+IPAddress subnet(255,255,255,0);
+ESP8266WebServer server(80);
+
+String SendHTML()
+    {  
+/* Html Start*/
+String ptr = "<!DOCTYPE html>\n";
+ptr +="<html>\n";
+ptr +="<head> <meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head>\n";
+
+    ptr +="<script>\n";
+    ptr +="function startTime() { \n";
+    ptr+="var today = new Date();";
+ptr+="var dow=today.getDay();";
+ptr+="var h = today.getHours();";
+ptr+="var m = today.getMinutes();";
+ptr+="var s = today.getSeconds();";
+ptr+="m = checkTime(m);";
+ptr+="s = checkTime(s);";
+ptr+="var d = new Date();";
+ptr+="var weekday = new Array(7);";
+ptr+="weekday[0] =  \"Sunday\";";
+ptr+="weekday[1] = \"Monday\";";
+ptr+="weekday[2] = \"Tuesday\";";
+ptr+="weekday[3] = \"Wednesday\";";
+ptr+="weekday[4] = \"Thursday\";";
+ptr+="weekday[5] = \"Friday\";";
+ptr+="weekday[6] = \"Saturday\";";
+ptr+="var n = weekday[d.getDay()];";
+ptr+="var f = new Date();";
+ptr+="var month= new Array(11);";
+ptr+="month[0] =\"January\";";
+ptr+="month[1] =\"February\";";
+ptr+="month[2] = \"March\";";
+ptr+="month[3] = \"April\";";
+ptr+="month[4] = \"May\";";
+ptr+="month[5] = \"June\";";
+ptr+="month[6] = \"July\";";
+ptr+="month[7] = \"August\";";
+ptr+="month[8] = \"September\";";
+ptr+="month[9] =\"October\";";
+ptr+="month[10] =\"November\";";
+ptr+="month[11] =\"December\";";
+ptr+="var month = month[f.getMonth()];";
+ptr+="  var  y = today.getFullYear();";
+ptr+="  var  mo = today.getMonth() + 1;";
+ptr+="  var  da = today.getDate();";
+ptr+="  document.getElementById(\'txt\').innerHTML =h + \":\" + m +\":\" + s+\"::\"+n+\", \"+da + \" , \" + month + \", \" + y;";
+ptr+="}";
+ptr+=" function checkTime(i) {";
+ptr+="    if (i < 10) {i = \"0\" + i}; "; // add zero in front of numbers < 10
+ptr+="    return i;";
+ptr+="}";
+
+    ptr +="</script>\n";
+    ptr +="\n";
+   //additional coding required
+ptr+="<body onload=\'startTime()\' align=\'center\'><br><br><br>";
+ptr+="<div id=\"txt\"></div>";
+ptr+="<form action=\'/submit\' align = \"center\"  method=\'post\'>";
+
+ptr+="From Time(HH:MM) <input type=\"number\" name=\"onH\" min=\"0\" max=\"23\">:&nbsp&nbsp<input type=\"number\" name=\"onM\" min=\"0\" max=\"59\"><br>";
+ptr+="To Time(HH:MM) <input type=\"number\" name=\"offH\" min=\"0\" max=\"23\">:&nbsp&nbsp<input type=\"number\" name=\"offM\" min=\"0\" max=\"59\"><br>";
+ptr+="<input type=\'submit\' value=\'submit\'>";
+  ptr+="</form></body></html>";
+/*html End*/
+return ptr;
+    }
+/*RTC related variiables(including G[svp]lobal) are to be declared[svp] here*/
+
+
+
+uint8_t onHour;
+uint8_t onMin;
+uint8_t offHour;
+uint8_t offMin;
+uint8_t Relay = 4;
+
+/* All global variable Ends here*/
+/*NodeMCU Methods  are to be declared here*/
+void handleRoot()
+{
+  server.send(200,"text/html",SendHTML());
+}
+
+void handle_NotFound(){
+  server.send(404, "text/plain", "Not found");
+}
+void submit()
+{
+ Serial.println("method Entered");
+int onHour;
+int onMin;
+int offHour;
+int offMin;
+ if (server.args() > 0 ) {
+    for ( uint8_t i = 0; i < server.args(); i++ )
+    {
+      if (server.argName(i) == "onH") {
+        Serial.println(server.arg(i));
+        onHour=server.arg(i).toInt();
+      }
+      if (server.argName(i)=="onM")
+      {
+        Serial.println(server.arg(i));
+        onMin=server.arg(i).toInt();
+      }
+      if(server.argName(i)=="offH")
+      {
+        Serial.println(server.arg(i));
+        offHour=server.arg(i).toInt();
+      }
+      if(server.argName(i)=="offM")
+      {
+        Serial.println(server.arg(i));
+        offMin=server.arg(i).toInt();
+      }
+   }
+   
+}
+    String ret="<html><head></head><body><h3> <a href=\"http://192.168.2.1/ \"> BACK</a></body></html>";
+  server.send(200,"text/html",ret);
+}
+/*Relay  Related variable are to be declared here*/
+
+//ds3231
+
+
+void setup() {
+  /*WifisoftAP setup*/
+  delay(100);
+  Serial.begin(115200);
+  WiFi.mode(WIFI_OFF); 
+  WiFi.mode(WIFI_AP);         //Only Access point
+  delay(1000);
+  server.on("/", handleRoot);
+  server.on("/submit",submit);
+  server.onNotFound(handle_NotFound);
+  WiFi.softAPConfig(local_ip,gateway, subnet);
+  WiFi.softAP(ssid,password);
+  
+  server.begin();
+  Serial.println("HTTP SERVER STARTED");
+  /*RTC Setup and Related Methods*/
+
+
+}
+
+void loop() {
+  server.handleClient();
+ 
+}
