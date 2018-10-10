@@ -1,0 +1,178 @@
+//=======NODE MCU LIBRARIES=================
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+
+//========RTC-DS3231-RELATED LIBRARIES====
+#include <Wire.h> // must be included here so that Arduino library object file references work
+#include <RtcDS3231.h>
+RtcDS3231<TwoWire> Rtc(Wire);
+#define countof(a) (sizeof(a) / sizeof(a[0]))
+
+//========NODE-MCU DECLARATION======
+/* Put your SSID & Password */
+const char* ssid = "Mark_4.1";  // Enter SSID here
+const char* password = "12345678";  //Enter Password here
+uint8_t onHour;
+uint8_t onMin;
+uint8_t offHour;
+uint8_t offMin;
+uint8_t Relay = 13;
+/* All global variable Ends here*/
+/*SERVER RELATED DECLARATIONS AND METHODS */
+
+IPAddress local_ip(192,168,2,1);
+IPAddress gateway(192,168,2,1);
+IPAddress subnet(255,255,255,0);
+ESP8266WebServer server(80);
+
+//========WEB PAGE CODE====
+String SendHTML()
+    {  
+/* Html Start*/
+String ptr = "<!DOCTYPE html>\n";
+ptr +="<html>\n";
+ptr +="<head> <meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head>\n";
+
+   
+
+    ptr +="</script>\n";
+    ptr +="\n";
+   //additional coding required
+ptr+="<body onload=\'startTime()\' align=\'center\'><br><br><br>";
+ptr+="<div id=\"txt\"></div>";
+ptr+="<form action=\'/submit\' align = \"center\"  method=\'post\'>";
+
+ptr+="From Time(HH:MM) <input type=\"number\" name=\"onH\" min=\"0\" max=\"23\">:&nbsp&nbsp<input type=\"number\" name=\"onM\" min=\"0\" max=\"59\"><br>";
+ptr+="To Time(HH:MM) <input type=\"number\" name=\"offH\" min=\"0\" max=\"23\">:&nbsp&nbsp<input type=\"number\" name=\"offM\" min=\"0\" max=\"59\"><br>";
+
+ptr+="<input type=\'submit\' value=\'submit\'>";
+
+  ptr+="</form>";
+  ptr+="<a href=\"/onLight\"\"><button>Turn On </button></a>";
+ptr+= "<a href=\"/offLight\"\"><button>Turn Off </button></a><br/>";
+  ptr+="</body></html>";
+/*html End*/
+return ptr;
+    }
+  void handleRoot()
+{
+  server.send(200,"text/html",SendHTML());
+}
+
+void handle_NotFound(){
+  server.send(404, "text/plain", "Not found");
+}
+void submit()
+{
+ Serial.println("method Entered");
+
+ if (server.args() > 0 ) {
+    for ( uint8_t i = 0; i < server.args(); i++ )
+    {
+      if (server.argName(i) == "onH") {
+        Serial.println(server.arg(i));
+        onHour=server.arg(i).toInt();
+      }
+      if (server.argName(i)=="onM")
+      {
+        Serial.println(server.arg(i));
+        onMin=server.arg(i).toInt();
+      }
+      if(server.argName(i)=="offH")
+      {
+        Serial.println(server.arg(i));
+        offHour=server.arg(i).toInt();
+      }
+      if(server.argName(i)=="offM")
+      {
+        Serial.println(server.arg(i));
+        offMin=server.arg(i).toInt();
+      }
+    
+   }
+   
+}
+  String ret= "<html><head></head><body><h3> <a href=\"http://192.168.2.1/ \"> BACK</a></body></html>";
+  server.send(200,"text/html",ret);
+}
+
+//=============SERVER CODE END===========
+
+ void onLight()
+     {
+      digitalWrite(Relay,LOW);
+      server.send(200,"text/html",SendHTML());
+     }
+ void offLight()
+     {
+      digitalWrite(Relay,HIGH);
+      server.send(200,"text/html",SendHTML());
+     }
+  void printDateTime(const RtcDateTime& dt)
+{
+    char datestring[20];
+
+    snprintf_P(datestring, 
+            countof(datestring),
+            PSTR("%02u/%02u/%04u %02u:%02u:%02u"),
+            dt.Month(),
+            dt.Day(),
+            dt.Year(),
+            dt.Hour(),
+            dt.Minute(),
+            dt.Second() );
+    Serial.print(datestring);
+}
+
+
+ void setup()
+ {
+//=======DS3231 RELATED SETUP CODE====
+    Serial.begin(115200);
+    Serial.print("compiled: ");
+    Serial.print(__DATE__);
+    Serial.println(__TIME__);
+  Rtc.Begin();
+
+ //=====================NODE-MCU/SERVER RELATED SETUP CODE====
+  WiFi.mode(WIFI_OFF); 
+  WiFi.mode(WIFI_AP);         //Only Access point
+  delay(1000);
+  server.on("/", handleRoot);
+  server.on("/submit",submit);
+  server.on("/onLight",onLight);
+  server.on("/offLight",offLight);
+  server.onNotFound(handle_NotFound);
+  WiFi.softAPConfig(local_ip,gateway, subnet);
+  WiFi.softAP(ssid,password);
+  pinMode(Relay,OUTPUT);
+  digitalWrite(Relay,LOW);
+  server.begin();
+  Serial.println("HTTP SERVER STARTED");
+ //============================================================
+ }
+void loop()
+ {
+   //NODEMCU
+   server.handleClient();
+   
+   //===DS3231== 
+  
+     RtcDateTime now = Rtc.GetDateTime();
+    printDateTime(now);
+    Serial.println();
+     delay(1000);
+    //====
+     if(onHour==now.Hour() && onMin==now.Minute())
+  {
+    digitalWrite(Relay,HIGH);
+      Serial.println("light on");
+  }
+
+   else if(offHour==now.Hour() && offMin==now.Minute())
+  {
+    digitalWrite(Relay,LOW);//Change appropriately
+    Serial.println("Light Off");
+  }
+  
+ }
