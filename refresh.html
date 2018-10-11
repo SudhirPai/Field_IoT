@@ -10,16 +10,17 @@
    <script type="text/javascript" src="reloader.js"></script>
 </head>
 
-<body onload="reloadGraph()">
+<body onload="reloadRTCDisplay()">
    <img id="graph" src="plot.png" alt="My updating graph" />
 </body>
-<script>function reloadGraph() {
+<script>function reloadRTCDisplay() {
    var now = new Date();
-
-   document.images['graph'].src = 'plot.png?' + now.getTime();
-
+/*
+       RTC Code Here
+       
+                              */
    // Start new timer (1 min)
-   timeoutID = setTimeout('reloadGraph()', 1000);
+   timeoutID = setTimeout('reloadRTCDisplay()', 1000);
 }
 </script>
 </html>
